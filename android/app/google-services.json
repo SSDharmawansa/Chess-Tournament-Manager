@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "217472311902",
+    "project_id": "chess-tournament-manager-70540",
+    "storage_bucket": "chess-tournament-manager-70540.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217472311902:android:c6066ab18022ad118e4acf",
+        "android_client_info": {
+          "package_name": "com.ssddharmawansa.chesstournamentmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWZ7wGeuGMbefOdZFw11IM2P3Og4wsbzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
