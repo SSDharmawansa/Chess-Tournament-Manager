@@ -1,9 +1,11 @@
 import 'package:chess_tournament/models/tournament.dart';
 import 'package:chess_tournament/screens/tournaments/tournament_editor_screen.dart';
 import 'package:chess_tournament/screens/tournaments/tournament_list_screen.dart';
+import 'package:chess_tournament/state/auth_controller.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
 import 'package:chess_tournament/widgets/section_card.dart';
 import 'package:chess_tournament/widgets/stat_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +14,45 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
     final state = ref.watch(tournamentControllerProvider);
     final tournaments = state.tournaments;
     final latest = tournaments.isNotEmpty ? tournaments.first : null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Organizer Dashboard')),
+      appBar: AppBar(
+        title: const Text('Organizer Dashboard'),
+        actions: [
+          if (authState.user != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    ref.read(authControllerProvider.notifier).signOut();
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Text('Sign out'),
+                  ),
+                ],
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    backgroundImage: authState.user!.photoURL != null
+                        ? NetworkImage(authState.user!.photoURL!)
+                        : null,
+                    child: authState.user!.photoURL == null
+                        ? Text(_avatarInitial(authState.user!))
+                        : null,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -49,6 +84,15 @@ class HomeScreen extends ConsumerWidget {
                           color: Colors.white.withValues(alpha: 0.86),
                         ),
                   ),
+                  if (authState.user != null) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      'Signed in as ${authState.user!.displayName ?? authState.user!.email}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.82),
+                          ),
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   Wrap(
                     spacing: 12,
@@ -118,6 +162,11 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _avatarInitial(User user) {
+  final source = user.displayName ?? user.email ?? '?';
+  return source.isEmpty ? '?' : source.substring(0, 1).toUpperCase();
 }
 
 class _LatestTournamentCard extends StatelessWidget {

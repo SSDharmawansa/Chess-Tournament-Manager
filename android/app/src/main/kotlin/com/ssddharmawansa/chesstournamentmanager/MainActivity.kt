@@ -1,4 +1,4 @@
-package com.example.chess_tournament
+package com.ssddharmawansa.chesstournamentmanager
 
 import io.flutter.embedding.android.FlutterActivity
 
