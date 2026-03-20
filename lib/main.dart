@@ -117,7 +117,7 @@ class _ChessTournamentBootstrapAppState
 
   AppSession _googleSessionFor(User user) {
     return AppSession.google(
-      repository: FirestoreTournamentRepository(),
+      repository: FirestoreTournamentRepository(userId: user.uid),
       displayName: user.displayName,
       email: user.email,
     );
