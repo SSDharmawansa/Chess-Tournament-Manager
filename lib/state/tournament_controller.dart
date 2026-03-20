@@ -96,7 +96,7 @@ class TournamentController extends StateNotifier<TournamentState> {
     } catch (error) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Could not load tournaments from Firebase: $error',
+        errorMessage: 'Could not load tournaments: $error',
       );
     }
   }
@@ -130,9 +130,7 @@ class TournamentController extends StateNotifier<TournamentState> {
         clearError: true,
       );
     } catch (error) {
-      state = state.copyWith(
-        errorMessage: 'Could not save tournament to Firebase: $error',
-      );
+      state = state.copyWith(errorMessage: 'Could not save tournament: $error');
       rethrow;
     }
   }
