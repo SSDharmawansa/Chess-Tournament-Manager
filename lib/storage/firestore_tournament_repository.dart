@@ -3,13 +3,17 @@ import 'package:chess_tournament/storage/tournament_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreTournamentRepository implements TournamentRepository {
-  FirestoreTournamentRepository({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+  FirestoreTournamentRepository({
+    required this.userId,
+    FirebaseFirestore? firestore,
+  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final String userId;
 
   final FirebaseFirestore _firestore;
 
   CollectionReference<Map<String, dynamic>> get _collection =>
-      _firestore.collection('tournaments');
+      _firestore.collection('users').doc(userId).collection('tournaments');
 
   @override
   Future<List<Tournament>> loadTournaments() async {
@@ -25,7 +29,10 @@ class FirestoreTournamentRepository implements TournamentRepository {
 
   @override
   Future<void> saveTournament(Tournament tournament) {
-    return _collection.doc(tournament.id).set(tournament.toJson());
+    return _collection.doc(tournament.id).set({
+      ...tournament.toJson(),
+      'ownerUserId': userId,
+    });
   }
 
   @override
@@ -33,7 +40,10 @@ class FirestoreTournamentRepository implements TournamentRepository {
     final batch = _firestore.batch();
 
     for (final tournament in tournaments) {
-      batch.set(_collection.doc(tournament.id), tournament.toJson());
+      batch.set(_collection.doc(tournament.id), {
+        ...tournament.toJson(),
+        'ownerUserId': userId,
+      });
     }
 
     await batch.commit();
