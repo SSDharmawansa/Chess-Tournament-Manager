@@ -24,7 +24,10 @@ class RoundMatchTile extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 10,
+        ),
         title: Text('Table ${match.tableNumber}'),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),

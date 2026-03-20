@@ -1,11 +1,9 @@
 import 'package:chess_tournament/models/tournament.dart';
 import 'package:chess_tournament/screens/tournaments/tournament_editor_screen.dart';
 import 'package:chess_tournament/screens/tournaments/tournament_list_screen.dart';
-import 'package:chess_tournament/state/auth_controller.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
 import 'package:chess_tournament/widgets/section_card.dart';
 import 'package:chess_tournament/widgets/stat_card.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,45 +12,13 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
     final state = ref.watch(tournamentControllerProvider);
     final tournaments = state.tournaments;
     final latest = tournaments.isNotEmpty ? tournaments.first : null;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Organizer Dashboard'),
-        actions: [
-          if (authState.user != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'logout') {
-                    ref.read(authControllerProvider.notifier).signOut();
-                  }
-                },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Text('Sign out'),
-                  ),
-                ],
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: CircleAvatar(
-                    backgroundImage: authState.user!.photoURL != null
-                        ? NetworkImage(authState.user!.photoURL!)
-                        : null,
-                    child: authState.user!.photoURL == null
-                        ? Text(_avatarInitial(authState.user!))
-                        : null,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Organizer Dashboard')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -62,7 +28,11 @@ class HomeScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF123F39), Color(0xFF1B7F77), Color(0xFFF1E7C9)],
+                  colors: [
+                    Color(0xFF123F39),
+                    Color(0xFF1B7F77),
+                    Color(0xFFF1E7C9),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -72,27 +42,18 @@ class HomeScreen extends ConsumerWidget {
                 children: [
                   Text(
                     'Chess Team Tournament Control',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Create tournaments, manage squads, generate pairings, correct results, and publish standings from one offline workspace.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.86),
-                        ),
-                  ),
-                  if (authState.user != null) ...[
-                    const SizedBox(height: 14),
-                    Text(
-                      'Signed in as ${authState.user!.displayName ?? authState.user!.email}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.82),
-                          ),
+                    'Create tournaments, manage squads, generate pairings, correct results, and publish standings from one Firebase-backed workspace.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.86),
                     ),
-                  ],
+                  ),
                   const SizedBox(height: 18),
                   Wrap(
                     spacing: 12,
@@ -121,6 +82,33 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            if (state.errorMessage != null) ...[
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.cloud_off_rounded,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        state.errorMessage!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
             Row(
               children: [
@@ -135,7 +123,8 @@ class HomeScreen extends ConsumerWidget {
                 Expanded(
                   child: StatCard(
                     label: 'Teams tracked',
-                    value: '${tournaments.fold<int>(0, (sum, item) => sum + item.teams.length)}',
+                    value:
+                        '${tournaments.fold<int>(0, (sum, item) => sum + item.teams.length)}',
                     icon: Icons.groups_rounded,
                   ),
                 ),
@@ -145,11 +134,13 @@ class HomeScreen extends ConsumerWidget {
             SectionCard(
               title: 'Recent Tournament',
               subtitle: latest == null
-                  ? 'Seed data will appear here after startup.'
-                  : 'Continue with the most recent organizer workspace.',
+                  ? 'Seed data will appear here after the first Firebase sync.'
+                  : 'Continue with the most recent synced organizer workspace.',
               trailing: TextButton(
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const TournamentListScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const TournamentListScreen(),
+                  ),
                 ),
                 child: const Text('View all'),
               ),
@@ -162,11 +153,6 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-String _avatarInitial(User user) {
-  final source = user.displayName ?? user.email ?? '?';
-  return source.isEmpty ? '?' : source.substring(0, 1).toUpperCase();
 }
 
 class _LatestTournamentCard extends StatelessWidget {

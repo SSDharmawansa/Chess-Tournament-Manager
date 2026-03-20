@@ -66,20 +66,20 @@ class Tournament {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'location': location,
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
-        'numberOfRounds': numberOfRounds,
-        'timeControl': timeControl,
-        'type': type.name,
-        'notes': notes,
-        'pairingMethod': pairingMethod.name,
-        'teams': teams.map((team) => team.toJson()).toList(),
-        'rounds': rounds.map((round) => round.toJson()).toList(),
-        'lastUpdated': lastUpdated.toIso8601String(),
-      };
+    'id': id,
+    'name': name,
+    'location': location,
+    'startDate': startDate.toIso8601String(),
+    'endDate': endDate.toIso8601String(),
+    'numberOfRounds': numberOfRounds,
+    'timeControl': timeControl,
+    'type': type.name,
+    'notes': notes,
+    'pairingMethod': pairingMethod.name,
+    'teams': teams.map((team) => team.toJson()).toList(),
+    'rounds': rounds.map((round) => round.toJson()).toList(),
+    'lastUpdated': lastUpdated.toIso8601String(),
+  };
 
   factory Tournament.fromJson(Map<String, dynamic> json) {
     return Tournament(
@@ -88,16 +88,20 @@ class Tournament {
       location: json['location'] as String,
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
-      numberOfRounds: json['numberOfRounds'] as int,
+      numberOfRounds: (json['numberOfRounds'] as num).toInt(),
       timeControl: json['timeControl'] as String,
       type: TournamentType.values.byName(json['type'] as String),
       notes: json['notes'] as String,
-      pairingMethod: PairingMethod.values.byName(json['pairingMethod'] as String),
+      pairingMethod: PairingMethod.values.byName(
+        json['pairingMethod'] as String,
+      ),
       teams: (json['teams'] as List<dynamic>)
           .map((team) => Team.fromJson(team as Map<String, dynamic>))
           .toList(),
       rounds: (json['rounds'] as List<dynamic>)
-          .map((round) => TournamentRound.fromJson(round as Map<String, dynamic>))
+          .map(
+            (round) => TournamentRound.fromJson(round as Map<String, dynamic>),
+          )
           .toList(),
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
     );

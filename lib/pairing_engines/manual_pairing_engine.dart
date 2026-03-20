@@ -33,7 +33,8 @@ class ManualPairingEngine implements PairingEngine {
     return PairingProposal(
       roundNumber: request.roundNumber,
       matches: matches,
-      notes: 'Manual pairing template. Edit pairings before publishing the round.',
+      notes:
+          'Manual pairing template. Edit pairings before publishing the round.',
     );
   }
 }

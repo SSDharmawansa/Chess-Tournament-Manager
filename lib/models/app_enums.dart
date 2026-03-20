@@ -18,11 +18,28 @@ enum PairingMethod {
   custom,
 }
 
-enum AgeCategory { open, under8, under10, under12, under14, under16, under18, senior }
+enum AgeCategory {
+  open,
+  under8,
+  under10,
+  under12,
+  under14,
+  under16,
+  under18,
+  senior,
+}
 
 enum Gender { open, male, female, other }
 
-enum MatchOutcome { pending, homeWin, awayWin, draw, forfeitHome, forfeitAway, bye }
+enum MatchOutcome {
+  pending,
+  homeWin,
+  awayWin,
+  draw,
+  forfeitHome,
+  forfeitAway,
+  bye,
+}
 
 extension TournamentTypeLabel on TournamentType {
   String get label {

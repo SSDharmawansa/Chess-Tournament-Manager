@@ -20,7 +20,11 @@ class StandingsService {
     final provisional = stats.values.toList();
     for (final entry in provisional) {
       entry.buchholz = _opponentScoreTotal(tournament, entry.team.id, stats);
-      entry.sonnebornBerger = _sonnebornBerger(tournament, entry.team.id, stats);
+      entry.sonnebornBerger = _sonnebornBerger(
+        tournament,
+        entry.team.id,
+        stats,
+      );
     }
 
     provisional.sort((a, b) {
@@ -136,7 +140,8 @@ class StandingsService {
         final homeScore = match.homeTeamScore ?? 0;
         final awayScore = match.awayTeamScore ?? 0;
 
-        if ((isHome && homeScore > awayScore) || (isAway && awayScore > homeScore)) {
+        if ((isHome && homeScore > awayScore) ||
+            (isAway && awayScore > homeScore)) {
           total += opponentPoints;
         } else if (homeScore == awayScore) {
           total += opponentPoints / 2;

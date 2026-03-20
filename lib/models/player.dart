@@ -44,22 +44,22 @@ class Player {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'rating': rating,
-        'boardOrder': boardOrder,
-        'ageCategory': ageCategory.name,
-        'gender': gender.name,
-        'federation': federation,
-        'identificationNumber': identificationNumber,
-      };
+    'id': id,
+    'name': name,
+    'rating': rating,
+    'boardOrder': boardOrder,
+    'ageCategory': ageCategory.name,
+    'gender': gender.name,
+    'federation': federation,
+    'identificationNumber': identificationNumber,
+  };
 
   factory Player.fromJson(Map<String, dynamic> json) {
     return Player(
       id: json['id'] as String,
       name: json['name'] as String,
-      rating: json['rating'] as int,
-      boardOrder: json['boardOrder'] as int,
+      rating: (json['rating'] as num).toInt(),
+      boardOrder: (json['boardOrder'] as num).toInt(),
       ageCategory: AgeCategory.values.byName(json['ageCategory'] as String),
       gender: Gender.values.byName(json['gender'] as String),
       federation: json['federation'] as String,

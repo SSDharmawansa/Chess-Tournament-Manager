@@ -40,14 +40,14 @@ class Team {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'code': code,
-        'countryOrClub': countryOrClub,
-        'captainName': captainName,
-        'seedRating': seedRating,
-        'players': players.map((player) => player.toJson()).toList(),
-      };
+    'id': id,
+    'name': name,
+    'code': code,
+    'countryOrClub': countryOrClub,
+    'captainName': captainName,
+    'seedRating': seedRating,
+    'players': players.map((player) => player.toJson()).toList(),
+  };
 
   factory Team.fromJson(Map<String, dynamic> json) {
     return Team(
@@ -56,7 +56,7 @@ class Team {
       code: json['code'] as String,
       countryOrClub: json['countryOrClub'] as String,
       captainName: json['captainName'] as String,
-      seedRating: json['seedRating'] as int,
+      seedRating: (json['seedRating'] as num).toInt(),
       players: (json['players'] as List<dynamic>)
           .map((player) => Player.fromJson(player as Map<String, dynamic>))
           .toList(),

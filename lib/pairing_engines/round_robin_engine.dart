@@ -6,9 +6,14 @@ import 'package:chess_tournament/pairing_engines/pairing_engine.dart';
 class RoundRobinPairingEngine implements PairingEngine {
   @override
   PairingProposal generate(PairingRequest request) {
-    final rounds = _buildSchedule(request.teams, request.tournament.pairingMethod);
+    final rounds = _buildSchedule(
+      request.teams,
+      request.tournament.pairingMethod,
+    );
     final roundIndex = request.roundNumber - 1;
-    final selected = roundIndex < rounds.length ? rounds[roundIndex] : <RoundMatch>[];
+    final selected = roundIndex < rounds.length
+        ? rounds[roundIndex]
+        : <RoundMatch>[];
 
     return PairingProposal(
       roundNumber: request.roundNumber,
@@ -17,7 +22,10 @@ class RoundRobinPairingEngine implements PairingEngine {
     );
   }
 
-  List<List<RoundMatch>> _buildSchedule(List<Team> source, PairingMethod method) {
+  List<List<RoundMatch>> _buildSchedule(
+    List<Team> source,
+    PairingMethod method,
+  ) {
     final teams = [...source];
     if (teams.length.isOdd) {
       teams.add(
@@ -36,8 +44,9 @@ class RoundRobinPairingEngine implements PairingEngine {
     final schedule = <List<RoundMatch>>[];
     final rotation = [...teams];
     final baseRounds = rotation.length - 1;
-    final totalRounds =
-        method == PairingMethod.doubleRoundRobin ? baseRounds * 2 : baseRounds;
+    final totalRounds = method == PairingMethod.doubleRoundRobin
+        ? baseRounds * 2
+        : baseRounds;
 
     for (var round = 0; round < totalRounds; round++) {
       final current = <RoundMatch>[];

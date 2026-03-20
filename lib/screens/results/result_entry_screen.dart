@@ -1,3 +1,4 @@
+import 'package:chess_tournament/core/ui_feedback.dart';
 import 'package:chess_tournament/models/app_enums.dart';
 import 'package:chess_tournament/models/pairing.dart';
 import 'package:chess_tournament/models/team.dart';
@@ -8,10 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ResultEntryScreen extends ConsumerWidget {
-  const ResultEntryScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const ResultEntryScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
@@ -31,7 +29,8 @@ class ResultEntryScreen extends ConsumerWidget {
         if (tournament.rounds.isEmpty)
           const EmptyState(
             title: 'No active rounds',
-            message: 'Generate pairings first, then enter board-by-board results here.',
+            message:
+                'Generate pairings first, then enter board-by-board results here.',
           )
         else
           ...tournament.rounds.reversed.map(
@@ -40,14 +39,20 @@ class ResultEntryScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Round ${round.roundNumber}', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'Round ${round.roundNumber}',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 12),
                   ...round.matches.map(
                     (match) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: RoundMatchTile(
                         match: match,
-                        homeTeam: _teamById(tournament.teams, match.homeTeamId)!,
+                        homeTeam: _teamById(
+                          tournament.teams,
+                          match.homeTeamId,
+                        )!,
                         awayTeam: match.awayTeamId == null
                             ? null
                             : _teamById(tournament.teams, match.awayTeamId!),
@@ -83,20 +88,30 @@ class ResultEntryScreen extends ConsumerWidget {
     RoundMatch match,
     List<Team> teams,
   ) async {
-    final homeController =
-        TextEditingController(text: match.homeTeamScore?.toString() ?? '');
-    final awayController =
-        TextEditingController(text: match.awayTeamScore?.toString() ?? '');
+    final homeController = TextEditingController(
+      text: match.homeTeamScore?.toString() ?? '',
+    );
+    final awayController = TextEditingController(
+      text: match.awayTeamScore?.toString() ?? '',
+    );
     final notesController = TextEditingController(text: match.notes);
     final home = _teamById(teams, match.homeTeamId)!;
-    final away = match.awayTeamId == null ? null : _teamById(teams, match.awayTeamId!);
-    var outcome = match.outcome == MatchOutcome.pending ? MatchOutcome.draw : match.outcome;
+    final away = match.awayTeamId == null
+        ? null
+        : _teamById(teams, match.awayTeamId!);
+    var outcome = match.outcome == MatchOutcome.pending
+        ? MatchOutcome.draw
+        : match.outcome;
     final boardResults = match.boardResults.isNotEmpty
         ? match.boardResults.map((board) => board.copyWith()).toList()
         : [
-            for (var index = 0;
-                away != null && index < home.players.length && index < away.players.length;
-                index++)
+            for (
+              var index = 0;
+              away != null &&
+                  index < home.players.length &&
+                  index < away.players.length;
+              index++
+            )
               BoardResult(
                 boardNumber: index + 1,
                 homePlayerId: home.players[index].id,
@@ -122,7 +137,9 @@ class ResultEntryScreen extends ConsumerWidget {
                       Expanded(
                         child: TextFormField(
                           controller: homeController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
                           decoration: InputDecoration(labelText: home.name),
                         ),
                       ),
@@ -130,8 +147,12 @@ class ResultEntryScreen extends ConsumerWidget {
                       Expanded(
                         child: TextFormField(
                           controller: awayController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          decoration: InputDecoration(labelText: away?.name ?? 'Bye'),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: away?.name ?? 'Bye',
+                          ),
                         ),
                       ),
                     ],
@@ -141,46 +162,82 @@ class ResultEntryScreen extends ConsumerWidget {
                     initialValue: outcome,
                     decoration: const InputDecoration(labelText: 'Outcome'),
                     items: const [
-                      DropdownMenuItem(value: MatchOutcome.homeWin, child: Text('Home win')),
-                      DropdownMenuItem(value: MatchOutcome.awayWin, child: Text('Away win')),
-                      DropdownMenuItem(value: MatchOutcome.draw, child: Text('Draw')),
-                      DropdownMenuItem(value: MatchOutcome.forfeitHome, child: Text('Home forfeits')),
-                      DropdownMenuItem(value: MatchOutcome.forfeitAway, child: Text('Away forfeits')),
-                      DropdownMenuItem(value: MatchOutcome.bye, child: Text('Bye')),
+                      DropdownMenuItem(
+                        value: MatchOutcome.homeWin,
+                        child: Text('Home win'),
+                      ),
+                      DropdownMenuItem(
+                        value: MatchOutcome.awayWin,
+                        child: Text('Away win'),
+                      ),
+                      DropdownMenuItem(
+                        value: MatchOutcome.draw,
+                        child: Text('Draw'),
+                      ),
+                      DropdownMenuItem(
+                        value: MatchOutcome.forfeitHome,
+                        child: Text('Home forfeits'),
+                      ),
+                      DropdownMenuItem(
+                        value: MatchOutcome.forfeitAway,
+                        child: Text('Away forfeits'),
+                      ),
+                      DropdownMenuItem(
+                        value: MatchOutcome.bye,
+                        child: Text('Bye'),
+                      ),
                     ],
-                    onChanged: (value) => setStateDialog(() => outcome = value!),
+                    onChanged: (value) =>
+                        setStateDialog(() => outcome = value!),
                   ),
                   const SizedBox(height: 12),
                   if (boardResults.isNotEmpty)
                     ...boardResults.asMap().entries.map(
-                          (entry) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Row(
-                              children: [
-                                SizedBox(width: 54, child: Text('B${entry.value.boardNumber}')),
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue: entry.value.homeScore.toString(),
-                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                    decoration: const InputDecoration(labelText: 'Home'),
-                                    onChanged: (value) => boardResults[entry.key] = entry.value
-                                        .copyWith(homeScore: double.tryParse(value) ?? 0),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue: entry.value.awayScore.toString(),
-                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                    decoration: const InputDecoration(labelText: 'Away'),
-                                    onChanged: (value) => boardResults[entry.key] = entry.value
-                                        .copyWith(awayScore: double.tryParse(value) ?? 0),
-                                  ),
-                                ),
-                              ],
+                      (entry) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 54,
+                              child: Text('B${entry.value.boardNumber}'),
                             ),
-                          ),
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: entry.value.homeScore.toString(),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: 'Home',
+                                ),
+                                onChanged: (value) => boardResults[entry.key] =
+                                    entry.value.copyWith(
+                                      homeScore: double.tryParse(value) ?? 0,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: entry.value.awayScore.toString(),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: 'Away',
+                                ),
+                                onChanged: (value) => boardResults[entry.key] =
+                                    entry.value.copyWith(
+                                      awayScore: double.tryParse(value) ?? 0,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                    ),
                   TextFormField(
                     controller: notesController,
                     maxLines: 2,
@@ -197,17 +254,24 @@ class ResultEntryScreen extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                await ref.read(tournamentControllerProvider.notifier).updateMatchResult(
-                      tournamentId,
-                      roundNumber,
-                      match.id,
-                      homeScore: double.tryParse(homeController.text) ?? 0,
-                      awayScore: double.tryParse(awayController.text) ?? 0,
-                      outcome: outcome,
-                      boardResults: boardResults,
-                      notes: notesController.text.trim(),
-                    );
-                if (context.mounted) Navigator.of(context).pop();
+                try {
+                  await ref
+                      .read(tournamentControllerProvider.notifier)
+                      .updateMatchResult(
+                        tournamentId,
+                        roundNumber,
+                        match.id,
+                        homeScore: double.tryParse(homeController.text) ?? 0,
+                        awayScore: double.tryParse(awayController.text) ?? 0,
+                        outcome: outcome,
+                        boardResults: boardResults,
+                        notes: notesController.text.trim(),
+                      );
+                  if (context.mounted) Navigator.of(context).pop();
+                } catch (error) {
+                  if (!context.mounted) return;
+                  showErrorSnackBar(context, 'Could not save result: $error');
+                }
               },
               child: const Text('Save result'),
             ),

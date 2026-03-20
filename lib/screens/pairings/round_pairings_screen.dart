@@ -1,3 +1,4 @@
+import 'package:chess_tournament/core/ui_feedback.dart';
 import 'package:chess_tournament/models/pairing.dart';
 import 'package:chess_tournament/models/team.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
@@ -7,15 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RoundPairingsScreen extends ConsumerStatefulWidget {
-  const RoundPairingsScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const RoundPairingsScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
   @override
-  ConsumerState<RoundPairingsScreen> createState() => _RoundPairingsScreenState();
+  ConsumerState<RoundPairingsScreen> createState() =>
+      _RoundPairingsScreenState();
 }
 
 class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
@@ -24,7 +23,9 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
   @override
   Widget build(BuildContext context) {
     final tournaments = ref.watch(tournamentControllerProvider).tournaments;
-    final match = tournaments.where((item) => item.id == widget.tournamentId).toList();
+    final match = tournaments
+        .where((item) => item.id == widget.tournamentId)
+        .toList();
     final tournament = match.isEmpty ? null : match.first;
 
     if (tournament == null) {
@@ -35,8 +36,9 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
     final activeRound = selectedRound == null
         ? (rounds.isNotEmpty ? rounds.last : null)
         : () {
-            final selected =
-                rounds.where((round) => round.roundNumber == selectedRound).toList();
+            final selected = rounds
+                .where((round) => round.roundNumber == selectedRound)
+                .toList();
             return selected.isEmpty ? null : selected.first;
           }();
 
@@ -64,7 +66,8 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
               child: activeRound == null
                   ? const EmptyState(
                       title: 'No rounds generated',
-                      message: 'Generate a round from the pairing tab to review pairings here.',
+                      message:
+                          'Generate a round from the pairing tab to review pairings here.',
                     )
                   : ListView.separated(
                       itemCount: activeRound.matches.length,
@@ -73,7 +76,10 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
                         final match = activeRound.matches[index];
                         return RoundMatchTile(
                           match: match,
-                          homeTeam: _teamById(tournament.teams, match.homeTeamId)!,
+                          homeTeam: _teamById(
+                            tournament.teams,
+                            match.homeTeamId,
+                          )!,
                           awayTeam: match.awayTeamId == null
                               ? null
                               : _teamById(tournament.teams, match.awayTeamId!),
@@ -119,7 +125,12 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
                 initialValue: homeId,
                 decoration: const InputDecoration(labelText: 'Home team'),
                 items: teams
-                    .map((team) => DropdownMenuItem(value: team.id, child: Text(team.name)))
+                    .map(
+                      (team) => DropdownMenuItem(
+                        value: team.id,
+                        child: Text(team.name),
+                      ),
+                    )
                     .toList(),
                 onChanged: (value) => setStateDialog(() => homeId = value!),
               ),
@@ -128,7 +139,10 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
                 initialValue: awayId,
                 decoration: const InputDecoration(labelText: 'Away team'),
                 items: [
-                  const DropdownMenuItem<String?>(value: null, child: Text('Bye')),
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text('Bye'),
+                  ),
                   ...teams
                       .where((team) => team.id != homeId)
                       .map(
@@ -149,15 +163,25 @@ class _RoundPairingsScreenState extends ConsumerState<RoundPairingsScreen> {
             ),
             FilledButton(
               onPressed: () async {
-                await ref.read(tournamentControllerProvider.notifier).updatePairing(
-                      widget.tournamentId,
-                      roundNumber,
-                      match.id,
-                      homeTeamId: homeId,
-                      awayTeamId: awayId,
-                    );
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
+                try {
+                  await ref
+                      .read(tournamentControllerProvider.notifier)
+                      .updatePairing(
+                        widget.tournamentId,
+                        roundNumber,
+                        match.id,
+                        homeTeamId: homeId,
+                        awayTeamId: awayId,
+                      );
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                } catch (error) {
+                  if (!context.mounted) return;
+                  showErrorSnackBar(
+                    context,
+                    'Could not update pairing: $error',
+                  );
+                }
               },
               child: const Text('Update'),
             ),

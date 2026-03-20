@@ -3,10 +3,7 @@ import 'package:chess_tournament/models/standing.dart';
 import 'package:flutter/material.dart';
 
 class StandingsTable extends StatelessWidget {
-  const StandingsTable({
-    super.key,
-    required this.standings,
-  });
+  const StandingsTable({super.key, required this.standings});
 
   final List<TeamStanding> standings;
 
@@ -34,7 +31,11 @@ class StandingsTable extends StatelessWidget {
                   DataCell(Text(AppFormatters.score(standing.gamePoints))),
                   DataCell(Text(AppFormatters.score(standing.buchholz))),
                   DataCell(Text(AppFormatters.score(standing.sonnebornBerger))),
-                  DataCell(Text('${standing.wins}-${standing.draws}-${standing.losses}')),
+                  DataCell(
+                    Text(
+                      '${standing.wins}-${standing.draws}-${standing.losses}',
+                    ),
+                  ),
                 ],
               ),
             )

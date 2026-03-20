@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chess_tournament/screens/auth/auth_gate_screen.dart';
+import 'package:chess_tournament/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,9 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _timer = Timer(
       const Duration(milliseconds: 1400),
-      () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const AuthGateScreen()),
-      ),
+      () => Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen())),
     );
   }
 
@@ -52,7 +52,11 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: Colors.white.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(28),
                 ),
-                child: const Icon(Icons.groups_2_rounded, size: 62, color: Colors.white),
+                child: const Icon(
+                  Icons.groups_2_rounded,
+                  size: 62,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 20),
               Text(

@@ -13,7 +13,8 @@ class TournamentListScreen extends ConsumerStatefulWidget {
   const TournamentListScreen({super.key});
 
   @override
-  ConsumerState<TournamentListScreen> createState() => _TournamentListScreenState();
+  ConsumerState<TournamentListScreen> createState() =>
+      _TournamentListScreenState();
 }
 
 class _TournamentListScreenState extends ConsumerState<TournamentListScreen> {
@@ -26,8 +27,7 @@ class _TournamentListScreenState extends ConsumerState<TournamentListScreen> {
       final term = query.toLowerCase();
       return tournament.name.toLowerCase().contains(term) ||
           tournament.location.toLowerCase().contains(term);
-    }).toList()
-      ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+    }).toList()..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Tournament List')),
@@ -78,7 +78,10 @@ class _TournamentTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
         title: Text(tournament.name),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),
@@ -89,12 +92,13 @@ class _TournamentTile extends ConsumerWidget {
         isThreeLine: true,
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          ref.read(tournamentControllerProvider.notifier).setSelectedTournament(
-                tournament.id,
-              );
+          ref
+              .read(tournamentControllerProvider.notifier)
+              .setSelectedTournament(tournament.id);
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => TournamentWorkspaceScreen(tournamentId: tournament.id),
+              builder: (_) =>
+                  TournamentWorkspaceScreen(tournamentId: tournament.id),
             ),
           );
         },

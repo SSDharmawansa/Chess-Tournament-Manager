@@ -1,3 +1,4 @@
+import 'package:chess_tournament/core/ui_feedback.dart';
 import 'package:chess_tournament/models/app_enums.dart';
 import 'package:chess_tournament/models/tournament.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
@@ -6,10 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TournamentEditorScreen extends ConsumerStatefulWidget {
-  const TournamentEditorScreen({
-    super.key,
-    this.initialTournament,
-  });
+  const TournamentEditorScreen({super.key, this.initialTournament});
 
   final Tournament? initialTournament;
 
@@ -18,7 +16,8 @@ class TournamentEditorScreen extends ConsumerStatefulWidget {
       _TournamentEditorScreenState();
 }
 
-class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen> {
+class _TournamentEditorScreenState
+    extends ConsumerState<TournamentEditorScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _locationController;
@@ -35,9 +34,12 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
     final initial = widget.initialTournament;
     _nameController = TextEditingController(text: initial?.name ?? '');
     _locationController = TextEditingController(text: initial?.location ?? '');
-    _timeControlController = TextEditingController(text: initial?.timeControl ?? '90+30');
-    _roundsController =
-        TextEditingController(text: '${initial?.numberOfRounds ?? 5}');
+    _timeControlController = TextEditingController(
+      text: initial?.timeControl ?? '90+30',
+    );
+    _roundsController = TextEditingController(
+      text: '${initial?.numberOfRounds ?? 5}',
+    );
     _notesController = TextEditingController(text: initial?.notes ?? '');
     _dateRange = DateTimeRange(
       start: initial?.startDate ?? DateTime.now(),
@@ -61,7 +63,11 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialTournament == null ? 'Create Tournament' : 'Edit Tournament'),
+        title: Text(
+          widget.initialTournament == null
+              ? 'Create Tournament'
+              : 'Edit Tournament',
+        ),
       ),
       body: SafeArea(
         child: Form(
@@ -76,8 +82,11 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                   children: [
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Tournament name'),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      decoration: const InputDecoration(
+                        labelText: 'Tournament name',
+                      ),
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Enter a tournament name'
                           : null,
                     ),
@@ -85,7 +94,8 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                     TextFormField(
                       controller: _locationController,
                       decoration: const InputDecoration(labelText: 'Location'),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Enter a location'
                           : null,
                     ),
@@ -95,7 +105,9 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                         Expanded(
                           child: TextFormField(
                             controller: _roundsController,
-                            decoration: const InputDecoration(labelText: 'Rounds'),
+                            decoration: const InputDecoration(
+                              labelText: 'Rounds',
+                            ),
                             keyboardType: TextInputType.number,
                             validator: (value) {
                               final rounds = int.tryParse(value ?? '');
@@ -110,8 +122,11 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                         Expanded(
                           child: TextFormField(
                             controller: _timeControlController,
-                            decoration: const InputDecoration(labelText: 'Time control'),
-                            validator: (value) => value == null || value.trim().isEmpty
+                            decoration: const InputDecoration(
+                              labelText: 'Time control',
+                            ),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
                                 ? 'Enter time control'
                                 : null,
                           ),
@@ -121,23 +136,35 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                     const SizedBox(height: 12),
                     DropdownButtonFormField<TournamentType>(
                       initialValue: _type,
-                      decoration: const InputDecoration(labelText: 'Tournament type'),
+                      decoration: const InputDecoration(
+                        labelText: 'Tournament type',
+                      ),
                       items: TournamentType.values
-                          .map((type) => DropdownMenuItem(value: type, child: Text(type.label)))
+                          .map(
+                            (type) => DropdownMenuItem(
+                              value: type,
+                              child: Text(type.label),
+                            ),
+                          )
                           .toList(),
                       onChanged: (value) => setState(() => _type = value!),
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<PairingMethod>(
                       initialValue: _pairingMethod,
-                      decoration: const InputDecoration(labelText: 'Pairing method'),
+                      decoration: const InputDecoration(
+                        labelText: 'Pairing method',
+                      ),
                       items: PairingMethod.values
                           .map(
-                            (method) =>
-                                DropdownMenuItem(value: method, child: Text(method.label)),
+                            (method) => DropdownMenuItem(
+                              value: method,
+                              child: Text(method.label),
+                            ),
                           )
                           .toList(),
-                      onChanged: (value) => setState(() => _pairingMethod = value!),
+                      onChanged: (value) =>
+                          setState(() => _pairingMethod = value!),
                     ),
                     const SizedBox(height: 12),
                     ListTile(
@@ -169,7 +196,9 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
                     TextFormField(
                       controller: _notesController,
                       maxLines: 4,
-                      decoration: const InputDecoration(labelText: 'Notes / description'),
+                      decoration: const InputDecoration(
+                        labelText: 'Notes / description',
+                      ),
                     ),
                   ],
                 ),
@@ -208,7 +237,12 @@ class _TournamentEditorScreenState extends ConsumerState<TournamentEditorScreen>
       lastUpdated: DateTime.now(),
     );
 
-    await controller.saveTournament(tournament);
-    if (mounted) Navigator.of(context).pop();
+    try {
+      await controller.saveTournament(tournament);
+      if (mounted) Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Could not save tournament: $error');
+    }
   }
 }

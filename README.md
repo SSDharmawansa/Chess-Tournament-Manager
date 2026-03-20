@@ -10,14 +10,15 @@ A Flutter mobile application for managing and organizing chess team tournaments.
 - Generate rounds and review pairings
 - Enter team and board-by-board results
 - Calculate live standings with common tie-break values
-- Save tournaments locally for offline use
+- Store tournaments in Firebase Cloud Firestore
 - Seeded dummy data for testing and demos
 
 ## Tech Stack
 
 - Flutter
+- Firebase Core
+- Cloud Firestore
 - Riverpod
-- Hive
 
 ## Project Structure
 
@@ -49,6 +50,28 @@ flutter pub get
 flutter run
 ```
 
+## Firebase Setup
+
+Tournament data now lives in the Firestore `tournaments` collection.
+
+- The current app bootstrap in `lib/firebase_options.dart` targets the Firebase project `chess-tournament-manager-70540`.
+- If you want to point the app at a different Firebase project, rerun `flutterfire configure` and replace the generated values in `lib/firebase_options.dart`.
+- The current Dart bootstrap is configured for Android, iOS, and macOS. Web and Windows still need explicit FlutterFire configuration before they can initialize Firebase.
+- Because the app does not currently sign users in, your Firestore rules must allow the app to read and write the `tournaments` collection during development.
+
+Example development rule:
+
+```text
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tournaments/{tournamentId} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
 ### Run checks
 
 ```bash
@@ -65,7 +88,7 @@ The Gradle wrapper is configured to use a project-local Gradle cache so the proj
 This repository includes:
 
 - Full Flutter app scaffold
-- Offline local storage
+- Firebase-backed tournament storage
 - Reusable tournament management UI
 - Modular pairing engine design
 - Summary/export integration points for future PDF, Excel, and cloud features
