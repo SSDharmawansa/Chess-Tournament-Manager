@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>217472311902-953r1tun70ou05rfq98p7dhpgpsuj31c.apps.googleusercontent.com</string>
+	<string>217472311902-7elp5bc2ounb5h4sqb639t21fukm8n4c.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.217472311902-953r1tun70ou05rfq98p7dhpgpsuj31c</string>
+	<string>com.googleusercontent.apps.217472311902-7elp5bc2ounb5h4sqb639t21fukm8n4c</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBohGSkDyiqXrNZeyZQSKqxhVgSIEr_ET0</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.ssddharmawansa.chesstournamentmanager</string>
+	<string>com.ssddharmawansa.chesstournamentmanager.macos</string>
 	<key>PROJECT_ID</key>
 	<string>chess-tournament-manager-70540</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:217472311902:ios:e6a7182be55b2bd78e4acf</string>
+	<string>1:217472311902:ios:743b3edee7e5dbe28e4acf</string>
 	<key>DATABASE_URL</key>
 	<string>https://chess-tournament-manager-70540-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>

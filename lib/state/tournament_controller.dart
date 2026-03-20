@@ -7,72 +7,98 @@ import 'package:chess_tournament/models/team.dart';
 import 'package:chess_tournament/models/tournament.dart';
 import 'package:chess_tournament/pairing_engines/pairing_engine.dart';
 import 'package:chess_tournament/services/standings_service.dart';
-import 'package:chess_tournament/storage/local_storage_service.dart';
+import 'package:chess_tournament/storage/tournament_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
-  throw UnimplementedError('Storage must be overridden at startup.');
+final tournamentRepositoryProvider = Provider<TournamentRepository>((ref) {
+  throw UnimplementedError(
+    'Tournament repository must be overridden at startup.',
+  );
 });
 
 final standingsServiceProvider = Provider((ref) => StandingsService());
 
 final tournamentControllerProvider =
     StateNotifierProvider<TournamentController, TournamentState>((ref) {
-  final controller = TournamentController(
-    storage: ref.watch(localStorageServiceProvider),
-    standingsService: ref.watch(standingsServiceProvider),
-  );
-  controller.load();
-  return controller;
-});
+      final controller = TournamentController(
+        repository: ref.watch(tournamentRepositoryProvider),
+        standingsService: ref.watch(standingsServiceProvider),
+      );
+      controller.load();
+      return controller;
+    });
 
 class TournamentState {
   const TournamentState({
     this.isLoading = true,
     this.tournaments = const [],
     this.selectedTournamentId,
+    this.errorMessage,
   });
 
   final bool isLoading;
   final List<Tournament> tournaments;
   final String? selectedTournamentId;
+  final String? errorMessage;
 
   TournamentState copyWith({
     bool? isLoading,
     List<Tournament>? tournaments,
     String? selectedTournamentId,
+    bool clearSelectedTournamentId = false,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return TournamentState(
       isLoading: isLoading ?? this.isLoading,
       tournaments: tournaments ?? this.tournaments,
-      selectedTournamentId: selectedTournamentId ?? this.selectedTournamentId,
+      selectedTournamentId: clearSelectedTournamentId
+          ? null
+          : selectedTournamentId ?? this.selectedTournamentId,
+      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
   }
 }
 
 class TournamentController extends StateNotifier<TournamentState> {
   TournamentController({
-    required LocalStorageService storage,
+    required TournamentRepository repository,
     required StandingsService standingsService,
-  })  : _storage = storage,
-        _standingsService = standingsService,
-        super(const TournamentState());
+  }) : _repository = repository,
+       _standingsService = standingsService,
+       super(const TournamentState());
 
-  final LocalStorageService _storage;
+  final TournamentRepository _repository;
   final StandingsService _standingsService;
 
   Future<void> load() async {
-    state = state.copyWith(isLoading: true);
-    final stored = await _storage.loadTournaments();
-    final tournaments = stored.isEmpty ? DummyTournaments.seed() : stored;
-    if (stored.isEmpty) {
-      await _storage.saveTournaments(tournaments);
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final stored = await _repository.loadTournaments();
+      final tournaments = [
+        ...(stored.isEmpty ? DummyTournaments.seed() : stored),
+      ]..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+
+      if (stored.isEmpty) {
+        await _repository.saveTournaments(tournaments);
+      }
+
+      state = state.copyWith(
+        isLoading: false,
+        tournaments: tournaments,
+        selectedTournamentId: tournaments.isNotEmpty
+            ? tournaments.first.id
+            : null,
+        clearSelectedTournamentId: tournaments.isEmpty,
+        clearError: true,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Could not load tournaments from Firebase: $error',
+      );
     }
-    state = state.copyWith(
-      isLoading: false,
-      tournaments: tournaments,
-      selectedTournamentId: tournaments.isNotEmpty ? tournaments.first.id : null,
-    );
   }
 
   Tournament? byId(String tournamentId) {
@@ -93,7 +119,22 @@ class TournamentController extends StateNotifier<TournamentState> {
       next.add(updated);
     }
 
-    await _commit(next, updated.id);
+    next.sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+
+    try {
+      await _repository.saveTournament(updated);
+      state = state.copyWith(
+        tournaments: next,
+        isLoading: false,
+        selectedTournamentId: updated.id,
+        clearError: true,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        errorMessage: 'Could not save tournament to Firebase: $error',
+      );
+      rethrow;
+    }
   }
 
   Future<void> setSelectedTournament(String tournamentId) async {
@@ -107,7 +148,11 @@ class TournamentController extends StateNotifier<TournamentState> {
     await saveTournament(updated);
   }
 
-  Future<void> addPlayer(String tournamentId, String teamId, Player player) async {
+  Future<void> addPlayer(
+    String tournamentId,
+    String teamId,
+    Player player,
+  ) async {
     final tournament = byId(tournamentId);
     if (tournament == null) return;
     final nextTeams = tournament.teams.map((team) {
@@ -140,7 +185,9 @@ class TournamentController extends StateNotifier<TournamentState> {
       matches: proposal.matches,
       notes: proposal.notes,
     );
-    await saveTournament(tournament.copyWith(rounds: [...tournament.rounds, round]));
+    await saveTournament(
+      tournament.copyWith(rounds: [...tournament.rounds, round]),
+    );
   }
 
   Future<void> updatePairing(
@@ -204,14 +251,5 @@ class TournamentController extends StateNotifier<TournamentState> {
     final tournament = byId(tournamentId);
     if (tournament == null) return [];
     return _standingsService.build(tournament);
-  }
-
-  Future<void> _commit(List<Tournament> tournaments, String selectedTournamentId) async {
-    await _storage.saveTournaments(tournaments);
-    state = state.copyWith(
-      tournaments: tournaments,
-      isLoading: false,
-      selectedTournamentId: selectedTournamentId,
-    );
   }
 }

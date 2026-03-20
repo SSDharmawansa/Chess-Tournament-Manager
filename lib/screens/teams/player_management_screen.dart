@@ -1,3 +1,4 @@
+import 'package:chess_tournament/core/ui_feedback.dart';
 import 'package:chess_tournament/models/app_enums.dart';
 import 'package:chess_tournament/models/player.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
@@ -21,17 +22,22 @@ class PlayerManagementScreen extends ConsumerStatefulWidget {
       _PlayerManagementScreenState();
 }
 
-class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen> {
+class _PlayerManagementScreenState
+    extends ConsumerState<PlayerManagementScreen> {
   String query = '';
 
   @override
   Widget build(BuildContext context) {
     final tournaments = ref.watch(tournamentControllerProvider).tournaments;
-    final tournamentMatches =
-        tournaments.where((item) => item.id == widget.tournamentId).toList();
-    final tournament = tournamentMatches.isEmpty ? null : tournamentMatches.first;
+    final tournamentMatches = tournaments
+        .where((item) => item.id == widget.tournamentId)
+        .toList();
+    final tournament = tournamentMatches.isEmpty
+        ? null
+        : tournamentMatches.first;
     final teamMatches =
-        tournament?.teams.where((item) => item.id == widget.teamId).toList() ?? [];
+        tournament?.teams.where((item) => item.id == widget.teamId).toList() ??
+        [];
     final team = teamMatches.isEmpty ? null : teamMatches.first;
 
     if (team == null) {
@@ -42,8 +48,7 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
       final term = query.toLowerCase();
       return player.name.toLowerCase().contains(term) ||
           player.federation.toLowerCase().contains(term);
-    }).toList()
-      ..sort((a, b) => a.boardOrder.compareTo(b.boardOrder));
+    }).toList()..sort((a, b) => a.boardOrder.compareTo(b.boardOrder));
 
     return Scaffold(
       appBar: AppBar(title: Text('${team.name} Players')),
@@ -65,7 +70,8 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
               child: players.isEmpty
                   ? const EmptyState(
                       title: 'No players yet',
-                      message: 'Add board members to make team pairings usable.',
+                      message:
+                          'Add board members to make team pairings usable.',
                     )
                   : ListView.separated(
                       itemCount: players.length,
@@ -114,8 +120,9 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                   TextFormField(
                     controller: nameController,
                     decoration: const InputDecoration(labelText: 'Player name'),
-                    validator: (value) =>
-                        value == null || value.trim().isEmpty ? 'Required' : null,
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? 'Required'
+                        : null,
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -124,7 +131,9 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                         child: TextFormField(
                           controller: ratingController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Rating'),
+                          decoration: const InputDecoration(
+                            labelText: 'Rating',
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -140,25 +149,40 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                   const SizedBox(height: 10),
                   DropdownButtonFormField<AgeCategory>(
                     initialValue: ageCategory,
-                    decoration: const InputDecoration(labelText: 'Age category'),
+                    decoration: const InputDecoration(
+                      labelText: 'Age category',
+                    ),
                     items: AgeCategory.values
-                        .map((value) => DropdownMenuItem(value: value, child: Text(value.label)))
+                        .map(
+                          (value) => DropdownMenuItem(
+                            value: value,
+                            child: Text(value.label),
+                          ),
+                        )
                         .toList(),
-                    onChanged: (value) => setStateDialog(() => ageCategory = value!),
+                    onChanged: (value) =>
+                        setStateDialog(() => ageCategory = value!),
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<Gender>(
                     initialValue: gender,
                     decoration: const InputDecoration(labelText: 'Gender'),
                     items: Gender.values
-                        .map((value) => DropdownMenuItem(value: value, child: Text(value.label)))
+                        .map(
+                          (value) => DropdownMenuItem(
+                            value: value,
+                            child: Text(value.label),
+                          ),
+                        )
                         .toList(),
                     onChanged: (value) => setStateDialog(() => gender = value!),
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: federationController,
-                    decoration: const InputDecoration(labelText: 'Federation / club'),
+                    decoration: const InputDecoration(
+                      labelText: 'Federation / club',
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
@@ -187,13 +211,16 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                   federation: federationController.text.trim(),
                   identificationNumber: idController.text.trim(),
                 );
-                await ref.read(tournamentControllerProvider.notifier).addPlayer(
-                      widget.tournamentId,
-                      widget.teamId,
-                      player,
-                    );
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
+                try {
+                  await ref
+                      .read(tournamentControllerProvider.notifier)
+                      .addPlayer(widget.tournamentId, widget.teamId, player);
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                } catch (error) {
+                  if (!context.mounted) return;
+                  showErrorSnackBar(context, 'Could not save player: $error');
+                }
               },
               child: const Text('Save'),
             ),

@@ -32,16 +32,16 @@ class BoardResult {
   }
 
   Map<String, dynamic> toJson() => {
-        'boardNumber': boardNumber,
-        'homePlayerId': homePlayerId,
-        'awayPlayerId': awayPlayerId,
-        'homeScore': homeScore,
-        'awayScore': awayScore,
-      };
+    'boardNumber': boardNumber,
+    'homePlayerId': homePlayerId,
+    'awayPlayerId': awayPlayerId,
+    'homeScore': homeScore,
+    'awayScore': awayScore,
+  };
 
   factory BoardResult.fromJson(Map<String, dynamic> json) {
     return BoardResult(
-      boardNumber: json['boardNumber'] as int,
+      boardNumber: (json['boardNumber'] as num).toInt(),
       homePlayerId: json['homePlayerId'] as String? ?? '',
       awayPlayerId: json['awayPlayerId'] as String? ?? '',
       homeScore: (json['homeScore'] as num).toDouble(),
@@ -104,21 +104,21 @@ class RoundMatch {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'tableNumber': tableNumber,
-        'homeTeamId': homeTeamId,
-        'awayTeamId': awayTeamId,
-        'boardResults': boardResults.map((board) => board.toJson()).toList(),
-        'outcome': outcome.name,
-        'homeTeamScore': homeTeamScore,
-        'awayTeamScore': awayTeamScore,
-        'notes': notes,
-      };
+    'id': id,
+    'tableNumber': tableNumber,
+    'homeTeamId': homeTeamId,
+    'awayTeamId': awayTeamId,
+    'boardResults': boardResults.map((board) => board.toJson()).toList(),
+    'outcome': outcome.name,
+    'homeTeamScore': homeTeamScore,
+    'awayTeamScore': awayTeamScore,
+    'notes': notes,
+  };
 
   factory RoundMatch.fromJson(Map<String, dynamic> json) {
     return RoundMatch(
       id: json['id'] as String,
-      tableNumber: json['tableNumber'] as int,
+      tableNumber: (json['tableNumber'] as num).toInt(),
       homeTeamId: json['homeTeamId'] as String,
       awayTeamId: json['awayTeamId'] as String?,
       boardResults: (json['boardResults'] as List<dynamic>)
@@ -158,14 +158,14 @@ class TournamentRound {
   }
 
   Map<String, dynamic> toJson() => {
-        'roundNumber': roundNumber,
-        'matches': matches.map((match) => match.toJson()).toList(),
-        'notes': notes,
-      };
+    'roundNumber': roundNumber,
+    'matches': matches.map((match) => match.toJson()).toList(),
+    'notes': notes,
+  };
 
   factory TournamentRound.fromJson(Map<String, dynamic> json) {
     return TournamentRound(
-      roundNumber: json['roundNumber'] as int,
+      roundNumber: (json['roundNumber'] as num).toInt(),
       matches: (json['matches'] as List<dynamic>)
           .map((match) => RoundMatch.fromJson(match as Map<String, dynamic>))
           .toList(),

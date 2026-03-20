@@ -76,7 +76,10 @@ class SwissPairingEngine implements PairingEngine {
     }
 
     return request.standings
-        .map((standing) => request.teams.firstWhere((team) => team.id == standing.teamId))
+        .map(
+          (standing) =>
+              request.teams.firstWhere((team) => team.id == standing.teamId),
+        )
         .toList();
   }
 

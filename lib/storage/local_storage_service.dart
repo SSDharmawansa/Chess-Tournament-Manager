@@ -26,8 +26,9 @@ class LocalStorageService {
   }
 
   Future<void> saveTournaments(List<Tournament> tournaments) {
-    final payload =
-        jsonEncode(tournaments.map((tournament) => tournament.toJson()).toList());
+    final payload = jsonEncode(
+      tournaments.map((tournament) => tournament.toJson()).toList(),
+    );
     return _box.put(_tournamentsKey, payload);
   }
 }

@@ -7,10 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SummaryScreen extends ConsumerWidget {
-  const SummaryScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const SummaryScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
@@ -37,8 +34,12 @@ class SummaryScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Venue: ${tournament.location}'),
-              Text('Dates: ${AppFormatters.dateRange(tournament.startDate, tournament.endDate)}'),
-              Text('Rounds: ${tournament.rounds.length}/${tournament.numberOfRounds}'),
+              Text(
+                'Dates: ${AppFormatters.dateRange(tournament.startDate, tournament.endDate)}',
+              ),
+              Text(
+                'Rounds: ${tournament.rounds.length}/${tournament.numberOfRounds}',
+              ),
               Text('Teams: ${tournament.teams.length}'),
               Text('Method: ${tournament.pairingMethod.label}'),
               const SizedBox(height: 16),
@@ -81,7 +82,7 @@ class SummaryScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-                      '$feature is scaffolded in the architecture and ready for implementation.',
+          '$feature is scaffolded in the architecture and ready for implementation.',
         ),
       ),
     );

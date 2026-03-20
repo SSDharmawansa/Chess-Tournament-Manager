@@ -1,3 +1,4 @@
+import 'package:chess_tournament/core/ui_feedback.dart';
 import 'package:chess_tournament/models/team.dart';
 import 'package:chess_tournament/screens/teams/player_management_screen.dart';
 import 'package:chess_tournament/state/tournament_controller.dart';
@@ -8,15 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TeamManagementScreen extends ConsumerStatefulWidget {
-  const TeamManagementScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const TeamManagementScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
   @override
-  ConsumerState<TeamManagementScreen> createState() => _TeamManagementScreenState();
+  ConsumerState<TeamManagementScreen> createState() =>
+      _TeamManagementScreenState();
 }
 
 class _TeamManagementScreenState extends ConsumerState<TeamManagementScreen> {
@@ -26,25 +25,26 @@ class _TeamManagementScreenState extends ConsumerState<TeamManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final tournaments = ref.watch(tournamentControllerProvider).tournaments;
-    final match =
-        tournaments.where((item) => item.id == widget.tournamentId).toList();
+    final match = tournaments
+        .where((item) => item.id == widget.tournamentId)
+        .toList();
     final tournament = match.isEmpty ? null : match.first;
 
     if (tournament == null) {
       return const Center(child: Text('Tournament not found.'));
     }
 
-    final teams = tournament.teams.where((team) {
-      final term = query.toLowerCase();
-      return team.name.toLowerCase().contains(term) ||
-          team.countryOrClub.toLowerCase().contains(term) ||
-          team.code.toLowerCase().contains(term);
-    }).toList()
-      ..sort(
-        sortBySeed
-            ? (a, b) => b.seedRating.compareTo(a.seedRating)
-            : (a, b) => a.name.compareTo(b.name),
-      );
+    final teams =
+        tournament.teams.where((team) {
+          final term = query.toLowerCase();
+          return team.name.toLowerCase().contains(term) ||
+              team.countryOrClub.toLowerCase().contains(term) ||
+              team.code.toLowerCase().contains(term);
+        }).toList()..sort(
+          sortBySeed
+              ? (a, b) => b.seedRating.compareTo(a.seedRating)
+              : (a, b) => a.name.compareTo(b.name),
+        );
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -75,7 +75,8 @@ class _TeamManagementScreenState extends ConsumerState<TeamManagementScreen> {
           child: teams.isEmpty
               ? const EmptyState(
                   title: 'No teams yet',
-                  message: 'Add the first team to begin pairings and standings.',
+                  message:
+                      'Add the first team to begin pairings and standings.',
                 )
               : Column(
                   children: teams
@@ -147,7 +148,9 @@ class _TeamManagementScreenState extends ConsumerState<TeamManagementScreen> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: clubController,
-                  decoration: const InputDecoration(labelText: 'Country / club'),
+                  decoration: const InputDecoration(
+                    labelText: 'Country / club',
+                  ),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -181,11 +184,16 @@ class _TeamManagementScreenState extends ConsumerState<TeamManagementScreen> {
                 seedRating: int.tryParse(seedController.text.trim()) ?? 0,
                 players: const [],
               );
-              await ref
-                  .read(tournamentControllerProvider.notifier)
-                  .addTeam(widget.tournamentId, team);
-              if (!context.mounted) return;
-              Navigator.of(context).pop();
+              try {
+                await ref
+                    .read(tournamentControllerProvider.notifier)
+                    .addTeam(widget.tournamentId, team);
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+              } catch (error) {
+                if (!context.mounted) return;
+                showErrorSnackBar(context, 'Could not save team: $error');
+              }
             },
             child: const Text('Save'),
           ),

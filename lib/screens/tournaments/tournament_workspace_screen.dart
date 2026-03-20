@@ -9,17 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TournamentWorkspaceScreen extends ConsumerWidget {
-  const TournamentWorkspaceScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const TournamentWorkspaceScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tournaments = ref.watch(tournamentControllerProvider).tournaments;
-    final matches = tournaments.where((item) => item.id == tournamentId).toList();
+    final matches = tournaments
+        .where((item) => item.id == tournamentId)
+        .toList();
 
     if (matches.isEmpty) {
       return const Scaffold(body: Center(child: Text('Tournament not found.')));

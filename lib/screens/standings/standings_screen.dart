@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class StandingsScreen extends ConsumerWidget {
-  const StandingsScreen({
-    super.key,
-    required this.tournamentId,
-  });
+  const StandingsScreen({super.key, required this.tournamentId});
 
   final String tournamentId;
 
@@ -17,7 +14,9 @@ class StandingsScreen extends ConsumerWidget {
     final tournaments = ref.watch(tournamentControllerProvider).tournaments;
     final match = tournaments.where((item) => item.id == tournamentId).toList();
     final tournament = match.isEmpty ? null : match.first;
-    final standings = ref.read(tournamentControllerProvider.notifier).standingsFor(tournamentId);
+    final standings = ref
+        .read(tournamentControllerProvider.notifier)
+        .standingsFor(tournamentId);
 
     if (tournament == null) {
       return const Center(child: Text('Tournament not found.'));
@@ -29,7 +28,8 @@ class StandingsScreen extends ConsumerWidget {
         if (standings.isEmpty)
           const EmptyState(
             title: 'Standings unavailable',
-            message: 'Add teams and results to calculate rankings and tie-breaks.',
+            message:
+                'Add teams and results to calculate rankings and tie-breaks.',
           )
         else
           StandingsTable(standings: standings),
